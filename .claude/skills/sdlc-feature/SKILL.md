@@ -12,7 +12,7 @@ Input: an epic id and a story id, e.g. `EPIC-1 STORY-1`. Output: one local commi
 2. **Plan.** Write a short plan (files, tests, acceptance criteria mapped to tests). Then call AskUserQuestion with the question "Approve plan?" and options `Approve` / `Request changes`. Do nothing else until answered; on `Request changes`, revise and ask again.
 3. **Implement.** Tests first, then the minimum code, only in the story's owner service. Run `python -m pytest` until green. If pytest is missing (the shared venv is read-only), run once `python -m venv --system-site-packages ~/.pytest-venv && ~/.pytest-venv/bin/pip install -q pytest`, then use `~/.pytest-venv/bin/python -m pytest` instead. Never add it to the repo.
 4. **Diff.** Show `git diff --stat` and the key hunks. Then call AskUserQuestion with the question "Approve diff?" and options `Approve` / `Request changes`. On `Request changes`, revise, re-run pytest, ask again.
-5. **Commit.** On `Approve`, `git add` and commit locally, no prompts, with `git -c user.name=developer -c user.email=developer@example.com commit -m "<STORY-ID>: <summary>"`. Never push. Do not ask about the commit identity. Reply with the commit hash and the pytest summary line, then stop.
+5. **Commit.** On `Approve`, run `sh .claude/skills/sdlc-feature/commit.sh "<STORY-ID>: <summary>"` (one line; the script sets the identity and stages everything except `.claude`). Never run git commit yourself, never push, never ask about identity. Reply with the commit hash and the pytest summary line, then stop.
 
 ## Design gaps
 If the design does not cover something you must decide (payload field, status code, failure behavior, ownership), stop at once and output exactly one line, then wait:
