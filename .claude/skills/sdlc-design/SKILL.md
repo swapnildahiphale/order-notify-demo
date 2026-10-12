@@ -8,10 +8,13 @@ description: Turn an epic's product one-pager into an approved design.md and sto
 Input: an epic id, e.g. `EPIC-1`. Output: `specs/<EPIC>/design.md` and `specs/<EPIC>/stories.md`. Never write or edit code.
 
 ## Steps
-1. **Read.** Read `specs/<EPIC>/one-pager.md` and the code of every service it touches (`orders/`, `notifications/`, ...).
-2. **Draft design.** Write `specs/<EPIC>/design.md` with the user: services touched, contracts (events, endpoints, payloads), data, failure and edge cases, test strategy, non-goals. Keep it to about one page. Use AskUserQuestion for each genuinely open decision, with 2-3 options and a recommendation.
-3. **Review.** Run the `design-reviewer` subagent on the epic (fresh context). Fix every blocking finding in `design.md`; apply suggestions only if they keep the design small. Re-run the reviewer if you changed contracts.
-4. **Approve architecture.** AskUserQuestion: "Approve architecture?" with options `Approve` / `Request changes`. On `Request changes`, collect the changes, edit `design.md`, return to step 3.
-5. **Write stories.** On approval write `specs/<EPIC>/stories.md`. For each story: `id` (STORY-1, ...), title, owner service, acceptance criteria, test impact, dependencies. Order so dependencies point backwards (e.g. consumer depends on producer).
-6. **Approve stories.** AskUserQuestion: "Approve stories?" with `Approve` / `Request changes`. Loop on changes.
-7. **Done.** Summarize in two lines: design and story files written. Stop. Do not start implementation.
+1. **Read.** Read `specs/<EPIC>/one-pager.md` and the code of every service it touches.
+2. **Clarify.** Ask at most 2-3 questions in ONE AskUserQuestion call, only for decisions the one-pager and code leave open (e.g. event payload, idempotency). Put your recommended option first and mark it "(Recommended)". Never ask what is already answered.
+3. **Draft.** Write `specs/<EPIC>/design.md`, about one page: services touched, contracts (event name and payload, endpoints and status codes), failure cases, test strategy, non-goals.
+4. **Review.** Run the `design-reviewer` subagent in the FOREGROUND (never in the background) and wait for its result. Fix every blocking finding in `design.md`; take suggestions only if they keep the design small.
+5. **Approve architecture.** Call AskUserQuestion with the question "Approve architecture?" and options `Approve` / `Request changes`. Do nothing else until answered. On `Request changes`, apply the feedback, then repeat from step 4.
+6. **Stories.** On `Approve`, write `specs/<EPIC>/stories.md` with exactly:
+   - STORY-1 (owner: orders): emit `order.shipped` when an order ships, and `GET /orders/:id/status`.
+   - STORY-2 (owner: notifications): consume `order.shipped` and send a stub email. Depends on STORY-1.
+   Each story has: id, title, owner service, acceptance criteria, test impact, dependencies.
+7. **Stop.** Reply with two lines naming the files written. Do not ask further questions and do not start implementation.

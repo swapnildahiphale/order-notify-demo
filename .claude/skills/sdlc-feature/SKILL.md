@@ -9,16 +9,13 @@ Input: an epic id and a story id, e.g. `EPIC-1 STORY-1`. Output: one local commi
 
 ## Steps
 1. **Read.** Read `specs/<EPIC>/design.md`, the story in `specs/<EPIC>/stories.md` (and any story it depends on), and the code you will touch.
-2. **Plan.** Write a short plan: files to change, tests to add, how acceptance criteria map to tests.
-3. **Approve plan.** AskUserQuestion: "Approve plan?" with `Approve` / `Request changes`. Loop on changes.
-4. **Implement.** Write the tests first and see them fail, then write the minimum code. Stay within the story's owner service.
-5. **Verify.** Run `python -m pytest`. Fix until green.
-6. **Show diff.** Show `git diff --stat` and the key part of the diff.
-7. **Approve diff.** AskUserQuestion: "Approve diff?" with `Approve` / `Request changes`. Loop on changes.
-8. **Commit.** On approve, `git add` and commit locally with a plain message that names the story. Do not push.
+2. **Plan.** Write a short plan (files, tests, acceptance criteria mapped to tests). Then call AskUserQuestion with the question "Approve plan?" and options `Approve` / `Request changes`. Do nothing else until answered; on `Request changes`, revise and ask again.
+3. **Implement.** Tests first, then the minimum code, only in the story's owner service. Run `python -m pytest` until green.
+4. **Diff.** Show `git diff --stat` and the key hunks. Then call AskUserQuestion with the question "Approve diff?" and options `Approve` / `Request changes`. On `Request changes`, revise, re-run pytest, ask again.
+5. **Commit.** On `Approve`, `git add` and commit locally with a plain message naming the story. Never push. Reply with the commit hash and the pytest result, then stop.
 
 ## Design gaps
-If the design does not cover something you must decide (payload field, status code, ownership, failure behavior), stop immediately and output exactly one line:
+If the design does not cover something you must decide (payload field, status code, failure behavior, ownership), stop at once and output exactly one line, then wait:
 
 `DESIGN QUESTION: <question>`
 
